@@ -1,0 +1,209 @@
+﻿<Window x:Class="SistemaOficina.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SistemaOficina"
+        mc:Ignorable="d"
+        Title="Sistema de Oficina - Autenticação" 
+        Height="600" Width="900"
+        MinWidth="800" MinHeight="550"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F6F7">
+
+    <Window.Resources>
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AABBC3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3498DB"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AABBC3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3498DB"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2471A3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#3498DB"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#2980B9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#2C3E50" Offset="0"/>
+                        <GradientStop Color="#3498DB" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Viewbox Margin="20">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+                    <Image Source="Resources/logo.png" MaxWidth="100" MaxHeight="100" Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Sistema de Gestão" Foreground="White" FontSize="22" FontWeight="Bold" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                    <TextBlock Text="de Oficina" Foreground="White" FontSize="22" FontWeight="Light" HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Gerencie sua oficina com" FontSize="12" Foreground="White" HorizontalAlignment="Center" FontWeight="Light" Margin="0,20,0,0"/>
+                    <TextBlock Text="eficiência e simplicidade." FontSize="12" Foreground="White" HorizontalAlignment="Center" FontWeight="Light"/>
+
+                </StackPanel>
+            </Viewbox>
+        </Grid>
+
+        <Grid Grid.Column="1" Background="White">
+            <Viewbox>
+                <Grid Width="400" Height="500">
+                    <Grid x:Name="LoginGrid">
+                        <StackPanel VerticalAlignment="Center" Margin="20">
+                            <TextBlock Text="Bem-vindo de Volta!" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Faça login para continuar" FontSize="14" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+
+                            <TextBlock Text="Usuário" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <TextBox x:Name="txtLoginUsername" Style="{StaticResource ModernTextBox}" Margin="0,0,0,20"/>
+
+                            <TextBlock Text="Senha" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <PasswordBox x:Name="pwdLoginPassword" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,10"/>
+
+                            <CheckBox x:Name="chkKeepLoggedIn" Content="Manter-me conectado" Margin="0,0,0,15" />
+                            <TextBlock x:Name="txtLoginError" Foreground="Red" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" MinHeight="20"/>
+
+                            <Button Content="LOGIN" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Height="45"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,25,0,0">
+                                <Button x:Name="btnShowRegisterView" Style="{StaticResource LinkButton}" Click="ShowRegisterView_Click">
+                                    <TextBlock Text="Não tem uma conta? Crie uma" TextDecorations="Underline"/>
+                                </Button>
+
+                                <TextBlock x:Name="textBlockSeparator" Text="|" Margin="10,0" Foreground="Gray" VerticalAlignment="Center"/>
+
+                                <Button x:Name="btnImportDatabase" Style="{StaticResource LinkButton}" Click="ImportDatabase_Click">
+                                    <TextBlock Text="Importar Banco de Dados" TextDecorations="Underline"/>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="RegisterGrid" Visibility="Collapsed">
+                        <StackPanel VerticalAlignment="Center" Margin="20">
+                            <TextBlock Text="Crie sua Conta" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                            <TextBlock Text="É rápido e fácil" FontSize="14" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+
+                            <TextBlock Text="Usuário" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <TextBox x:Name="txtRegisterUsername" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Senha" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <PasswordBox x:Name="pwdRegisterPassword" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Confirmar Senha" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <PasswordBox x:Name="pwdRegisterConfirmPassword" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Chave de Ativação" FontWeight="SemiBold" Margin="0,10,0,5"/>
+                            <PasswordBox x:Name="pwdActivationKey" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,25"/>
+                            <TextBlock x:Name="txtRegisterError" Foreground="Red" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" MinHeight="20"/>
+
+                            <Button Content="CRIAR CONTA" Style="{StaticResource PrimaryButton}" Click="RegisterButton_Click" Height="45"/>
+
+                            <Button Style="{StaticResource LinkButton}" Click="ShowLoginView_Click" HorizontalAlignment="Center" Margin="0,20,0,0">
+                                <TextBlock Text="Já tem uma conta? Faça o login" TextDecorations="Underline"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Viewbox>
+        </Grid>
+    </Grid>
+</Window>

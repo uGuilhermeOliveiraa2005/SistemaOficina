@@ -1,0 +1,31 @@
+﻿<Window x:Class="SistemaOficina.CustomMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SistemaOficina"
+        mc:Ignorable="d"
+        Title="CustomMessageBox" Height="200" Width="400"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterOwner">
+    <Border CornerRadius="8" Background="White" BorderBrush="#B0B3B8" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock x:Name="TitleTextBlock" Text="Caption" FontSize="16" FontWeight="Bold" Margin="15" Foreground="#2C3E50"/>
+
+            <TextBlock x:Name="MessageText" Grid.Row="1" Text="Message goes here." Margin="15,0" TextWrapping="Wrap" VerticalAlignment="Center"/>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15">
+                <Button x:Name="btnOk" Content="OK" Click="btnOk_Click" Padding="15,8" Margin="5" Background="#3498DB" Foreground="White" BorderThickness="0"/>
+                <Button x:Name="btnCancel" Content="Cancelar" Click="btnCancel_Click" Padding="15,8" Margin="5" Background="#BDC3C7" Foreground="White" BorderThickness="0"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

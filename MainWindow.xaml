@@ -1,0 +1,1949 @@
+﻿<Window x:Class="SistemaOficina.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SistemaOficina"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="Sistema de Gestão de Oficina v2.0" 
+        Height="768" Width="1366" 
+        MinHeight="720" MinWidth="1024"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="#F4F6F7"
+        Opacity="0"
+        Icon="Resources/icone.ico"
+        Loaded="MainWindow_Loaded">
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation
+                        Storyboard.TargetProperty="Opacity"
+                        From="0.0"
+                        To="1.0"
+                        Duration="0:0:0.5" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Window.Resources>
+        <local:RelativeDateConverter x:Key="RelativeDateConverter"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Foreground" Value="#3498DB"/>
+            <Setter Property="BorderBrush" Value="#3498DB"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{Binding Path=BorderBrush, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F2F3F4"/>
+                                <Setter Property="Foreground" Value="#AEB6BF"/>
+                                <Setter Property="BorderBrush" Value="#D5D8DC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Foreground" Value="#2ECC71"/>
+            <Setter Property="BorderBrush" Value="#2ECC71"/>
+        </Style>
+        <Style x:Key="WarningButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Foreground" Value="#E67E22"/>
+            <Setter Property="BorderBrush" Value="#E67E22"/>
+        </Style>
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="BorderBrush" Value="#E74C3C"/>
+        </Style>
+
+        <Style x:Key="AdminOnlyButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="IsEnabled" Value="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="ToolTip" Value="Acesso restrito a administradores."/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AdminOnlyWarningButton" TargetType="Button" BasedOn="{StaticResource WarningButton}">
+            <Setter Property="IsEnabled" Value="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="ToolTip" Value="Acesso restrito a administradores."/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AdminOnlyDangerButton" TargetType="Button" BasedOn="{StaticResource DangerButton}">
+            <Setter Property="IsEnabled" Value="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="ToolTip" Value="Acesso restrito a administradores."/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AABBC3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3498DB"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border" CornerRadius="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AABBC3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3498DB"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton" Grid.Column="2" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="30" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="4" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                            <Path x:Name="Arrow" Grid.Column="1" Data="M 0 0 L 4 4 L 8 0 Z" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#566573" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="#AABBC3" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="#3498DB" />
+                                                <Setter TargetName="Border" Property="BorderThickness" Value="1.5"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+                            <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Grid x:Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder" Background="White" BorderThickness="1" BorderBrush="#D0D3D4"/>
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#EAECEE"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Foreground" Value="#2C3E50" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0F0F0"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0" />
+                    <Setter Property="Foreground" Value="#2C3E50" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#566573"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,12"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="ModernDataGrid" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="RowHeaderWidth" Value="0"/>
+            <Setter Property="AlternationCount" Value="0"/>
+        </Style>
+
+        <Style TargetType="{x:Type DatePicker}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DatePicker}">
+                        <Grid x:Name="PART_Root">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <DatePickerTextBox x:Name="PART_TextBox" Grid.Column="0" Padding="{TemplateBinding Padding}" BorderThickness="0" Background="Transparent" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                    <Button x:Name="PART_Button" Grid.Column="1" Style="{x:Null}" Foreground="#566573" Background="Transparent" BorderThickness="0" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center" Focusable="False">
+                                        <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                            <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" StaysOpen="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#AABBC3"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#3498DB"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Sistema de Gestão de Oficina" FontSize="26" FontWeight="Bold"
+                       HorizontalAlignment="Left" Margin="25,15,15,15" Foreground="#2C3E50" VerticalAlignment="Center"/>
+
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,80,0">
+
+                <ToggleButton x:Name="btnAgendamentosPendentes"
+                              Cursor="Hand"
+                              Visibility="Collapsed">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Foreground" Value="#566573"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{TemplateBinding Background}" Padding="8" CornerRadius="4">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="txtContagemAgendamentos" Text="0 Agendamentos" FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#ECF0F1"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Background" Value="#E5E8E8"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
+
+                <Popup x:Name="popupAgendamentos"
+                       IsOpen="{Binding IsChecked, ElementName=btnAgendamentosPendentes, Mode=TwoWay}"
+                       Placement="Bottom"
+                       PlacementTarget="{Binding ElementName=btnAgendamentosPendentes}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade"
+                       Margin="0,5,0,0">
+
+                    <Border Background="White"
+                            CornerRadius="5"
+                            BorderBrush="#D5D8DC"
+                            BorderThickness="1"
+                            Padding="5"
+                            MinWidth="350">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="10" Color="Black" Opacity="0.15"/>
+                        </Border.Effect>
+
+                        <StackPanel>
+                            <TextBlock Text="Agendamentos Pendentes"
+                                       FontWeight="Bold"
+                                       Foreground="#2C3E50"
+                                       Margin="10,8,10,5"
+                                       FontSize="14"/>
+                            <Border BorderBrush="#EAEDED" BorderThickness="0,1,0,0" Margin="5,0,5,5"/>
+
+                            <ListView x:Name="lvAgendamentosPopup"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      MaxHeight="400"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="2"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="10,8"
+                                                x:Name="ItemBorder"
+                                                Background="Transparent"
+                                                CornerRadius="3">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                                           Text="{Binding NomeClienteDisplay}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#34495E"/>
+
+                                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,4,0,0">
+                                                    <TextBlock Text="{Binding Equipamento}"
+                                                               Foreground="#7F8C8D"
+                                                               FontStyle="Italic"/>
+                                                    <TextBlock Text=" • " Foreground="#AEB6BF" Margin="5,0"/>
+                                                    <TextBlock Text="{Binding DataAgendamento, Converter={StaticResource RelativeDateConverter}}"
+                                                               Foreground="#5D6D7E"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#F8F9F9"/>
+                                            </Trigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+            </Grid>
+
+            <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0" ToolTip="Sair (Logout)" Click="btnLogoutIcon_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Foreground" Value="#7F8C8D"/>
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" Padding="8" CornerRadius="50">
+                                        <TextBlock x:Name="Icon" Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#E74C3C"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <TabControl Grid.Row="1" Margin="10,0,10,10" Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged"
+                        BorderThickness="0" Background="Transparent">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Padding" Value="15,8"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Foreground" Value="#566573"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="Border" BorderThickness="0,0,0,3" BorderBrush="Transparent" Margin="0,0,5,0" Background="Transparent" Cursor="Hand">
+                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False"/>
+                                                <Condition Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="Border" Property="Background" Value="#ECF0F1"/>
+                                        </MultiTrigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="#3498DB"/>
+                                            <Setter Property="Foreground" Value="#2C3E50"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style TargetType="TabPanel">
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                    </Style>
+                </TabControl.Resources>
+
+                <TabItem Header="Dashboard" Name="DashboardTabItem" IsSelected="True">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Visão Geral" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+
+                            <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,25">
+                                <Border Background="White" CornerRadius="5" Padding="20" Margin="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="ORDENS ABERTAS" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,10"/>
+                                        <TextBlock x:Name="txtDashboardOrdensAbertas" Text="0" FontSize="36" FontWeight="Bold" Foreground="#3498DB" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="White" CornerRadius="5" Padding="20" Margin="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="CLIENTES TOTAIS" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,10"/>
+                                        <TextBlock x:Name="txtDashboardClientes" Text="0" FontSize="36" FontWeight="Bold" Foreground="#2ECC71" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="White" CornerRadius="5" Padding="20" Margin="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="SALDO DO DIA" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,10"/>
+                                        <TextBlock x:Name="txtDashboardSaldoDia" Text="R$ 0,00" FontSize="32" FontWeight="Bold" Foreground="#E67E22" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="White" CornerRadius="5" Padding="20" Margin="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="NOVAS OS NO MÊS" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,10"/>
+                                        <TextBlock x:Name="txtDashboardOsMes" Text="0" FontSize="36" FontWeight="Bold" Foreground="#9B59B6" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <Grid Grid.Row="2" Margin="0,20,0,0" VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="10,0,0,0">
+                                    <TextBlock Text="Atalhos Rápidos" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#34495E"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="btnAtalhoNovaOS" Click="btnAtalhoNovaOS_Click" Height="80" Width="180" Background="#3498DB" Cursor="Hand" Style="{x:Null}">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Center" Foreground="White"/>
+                                                <TextBlock Text="Nova Ordem Serviço" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="White"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="btnAtalhoNovoCliente" Click="btnAtalhoNovoCliente_Click" Height="80" Width="180" Background="#2ECC71" Cursor="Hand" Style="{x:Null}">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Center" Foreground="White"/>
+                                                <TextBlock Text="Adicionar Cliente" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="White"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="btnAtalhoCaixa" Click="btnAtalhoCaixa_Click" Height="80" Width="180" Background="#E67E22" Cursor="Hand" Style="{x:Null}">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="&#xE8A1;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Center" Foreground="White"/>
+                                                <TextBlock Text="Ver o Caixa" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="White"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Margin="40,0,10,0">
+                                    <TextBlock Text="Próximos Agendamentos" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="#34495E"/>
+                                    <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="5" Background="White">
+                                        <ListView x:Name="lvAgendamentosDashboard"
+                                                  BorderThickness="0"
+                                                  Background="Transparent"
+                                                  MaxHeight="250"
+                                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                  VerticalAlignment="Top">
+                                            <ListView.ItemContainerStyle>
+                                                <Style TargetType="ListViewItem">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                                    <Setter Property="Focusable" Value="False"/>
+                                                </Style>
+                                            </ListView.ItemContainerStyle>
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Padding="12,10" BorderBrush="#F2F3F4" BorderThickness="0,0,0,1">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding NomeClienteDisplay}" FontWeight="SemiBold" Foreground="#34495E" FontSize="14"/>
+                                                                <TextBlock Margin="0,3,0,0" Foreground="#7F8C8D">
+                                                                    <Run Text="{Binding Equipamento, Mode=OneWay}" FontStyle="Italic"/>
+                                                                    <Run Text=" • " Foreground="#AEB6BF"/>
+                                                                    <Run Text="{Binding DataAgendamento, StringFormat='dd/MM HH:mm', Mode=OneWay}"/>
+                                                                </TextBlock>
+                                                            </StackPanel>
+
+                                                            <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20,0,0,0">
+                                                                <TextBlock Text="{Binding TempoRestante}" FontSize="20" FontWeight="Bold" Foreground="#3498DB" HorizontalAlignment="Right"/>
+                                                                <TextBlock Text="Tempo Restante" FontSize="10" Foreground="#AEB6BF" HorizontalAlignment="Right"/>
+                                                            </StackPanel>
+
+                                                            <Button Grid.Row="1" Grid.ColumnSpan="2"
+                                                                    Click="btnDetalhesDashboard_Click"
+                                                                    Tag="{Binding}"
+                                                                    Content="Detalhes"
+                                                                    HorizontalAlignment="Right"
+                                                                    Margin="0,10,0,0"
+                                                                    Padding="10,3"
+                                                                    FontSize="11"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Cadastro Cliente" Name="CadastroClienteTabItem">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <Grid Margin="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Gerenciamento de Clientes" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+                            <Border Grid.Row="1" Background="White" CornerRadius="5" Padding="35" BorderBrush="#E0E0E0" BorderThickness="1" MinWidth="700" MaxWidth="800">
+                                <StackPanel>
+                                    <TextBlock Text="DADOS DO CLIENTE" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+                                    <TextBlock Text="Nome Completo:" Margin="0,5,0,5"/>
+                                    <TextBox x:Name="txtNomeCliente" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="CPF / CNPJ:" Margin="0,5,0,5"/>
+                                    <TextBox x:Name="txtCpfCnpjCliente" Style="{StaticResource ModernTextBox}" MaxLength="18" TextChanged="txtCpfCnpj_TextChanged" Margin="0,0,0,25"/>
+
+                                    <TextBlock Text="ENDEREÇO" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,10,0,15"/>
+                                    <TextBlock Text="Endereço (Rua, Número):" Margin="0,5,0,5"/>
+                                    <TextBox x:Name="txtEnderecoCliente" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+                                    <Grid Margin="0,0,0,25">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Bairro:" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtBairroCliente" Style="{StaticResource ModernTextBox}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Cidade:" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtCidadeCliente" Style="{StaticResource ModernTextBox}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Text="CONTATO" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,10,0,15"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Telefone 1:" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtTelefone1Cliente" MaxLength="19" TextChanged="txtTelefone_TextChanged" Style="{StaticResource ModernTextBox}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Telefone 2 (Opcional):" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtTelefone2Cliente" MaxLength="19" TextChanged="txtTelefone_TextChanged" Style="{StaticResource ModernTextBox}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" Margin="0,25,0,0" Width="320">
+                                <Button Content="Limpar Campos" x:Name="btnAdicionarCliente" Click="btnAdicionarCliente_Click" Margin="0,0,5,0" HorizontalAlignment="Stretch" Style="{StaticResource WarningButton}"/>
+                                <Button Content="Salvar Cliente" x:Name="btnSalvarCliente" Click="btnSalvarCliente_Click" Style="{StaticResource SuccessButton}" Margin="5,0,0,0" HorizontalAlignment="Stretch"/>
+                            </UniformGrid>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Clientes" x:Name="ClientesTab">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="0" x:Name="txtPesquisaCliente" TextChanged="txtPesquisaCliente_TextChanged" Margin="10" Padding="8" Style="{StaticResource ModernTextBox}" ToolTip="Pesquisar por Nome"/>
+                            <DataGrid Grid.Row="1" x:Name="dgClientes" Style="{StaticResource ModernDataGrid}" Margin="10" LostFocus="DataGrid_LostFocus">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="2.5*" MinWidth="200"/>
+                                    <DataGridTextColumn Header="Telefone 1" Binding="{Binding Telefone1}" Width="1.5*" MinWidth="120"/>
+
+                                    <DataGridTextColumn Header="CPF / CNPJ" Binding="{Binding CpfCnpj}" Width="1.5*" MinWidth="140"/>
+
+                                    <DataGridTextColumn Header="Cidade" Binding="{Binding Cidade}" Width="1.2*" MinWidth="120"/>
+                                    <DataGridTextColumn Header="Endereço" Binding="{Binding Endereco}" Width="2*" MinWidth="200"/>
+                                    <DataGridTemplateColumn Header="Ações" Width="*" MinWidth="220">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="Editar" Click="btnEditarClienteLista_Click" Style="{StaticResource AdminOnlyButton}"/>
+                                                    <Button Content="Ver Ordens" Click="btnVerOrdensRelacionadas_Click"/>
+                                                    <Button Click="btnExcluirCliente_Click" Style="{StaticResource AdminOnlyDangerButton}" Width="32" Height="32" Padding="0" ToolTip="Excluir Cliente">
+                                                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+                <TabItem Header="Ordem de Serviço (OS)" Name="OrdemServicoTabItem">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="15">
+                            <Border Background="White" CornerRadius="5" Padding="25" Margin="0,0,0,15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Informações Principais da OS" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#34495E"/>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Número da OS:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtNumeroOS" IsReadOnly="True" Margin="15,5" Width="150" HorizontalAlignment="Left" Style="{StaticResource ModernTextBox}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Cliente Cadastrado:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cmbClienteOS" Margin="15,5" SelectionChanged="cmbClienteOS_SelectionChanged" Cursor="Hand" Style="{StaticResource ModernComboBox}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="(ou) Cliente Avulso:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtNomeClienteOS" Margin="15,5" Style="{StaticResource ModernTextBox}"/>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Border Background="White" CornerRadius="5" Padding="25" Margin="0,0,0,15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Detalhes do Equipamento" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#34495E"/>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Aparelho:" Margin="0,0,0,2"/>
+                                            <TextBox x:Name="txtAparelho" Style="{StaticResource ModernTextBox}"/>
+                                            <TextBlock Text="Marca:" Margin="0,10,0,2"/>
+                                            <TextBox x:Name="txtMarcaEquipamento" Style="{StaticResource ModernTextBox}"/>
+                                            <TextBlock Text="Modelo:" Margin="0,10,0,2"/>
+                                            <TextBox x:Name="txtModeloEquipamento" Style="{StaticResource ModernTextBox}"/>
+                                            <TextBlock Text="Número de Série:" Margin="0,10,0,2"/>
+                                            <TextBox x:Name="txtNumeroSerie" Style="{StaticResource ModernTextBox}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="Garantia:" Margin="0,0,0,2"/>
+                                                    <ComboBox x:Name="cmbGarantia" Style="{StaticResource ModernComboBox}"/>
+                                                </StackPanel>
+                                                <StackPanel x:Name="spTempoGarantia" Grid.Column="2" Visibility="Collapsed">
+                                                    <TextBlock Text="Tempo de Garantia:" Margin="0,0,0,2"/>
+                                                    <ComboBox x:Name="cmbTempoGarantia" Style="{StaticResource ModernComboBox}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                            <TextBlock Text="Voltagem:" Margin="0,10,0,2"/>
+                                            <ComboBox x:Name="cmbVoltagem" Style="{StaticResource ModernComboBox}"/>
+                                            <TextBlock Text="Cor:" Margin="0,10,0,2"/>
+                                            <TextBox x:Name="txtCor" Style="{StaticResource ModernTextBox}"/>
+                                            <TextBlock Text="Departamento:" Margin="0,10,0,2"/>
+                                            <ComboBox x:Name="cmbDepartamento" Style="{StaticResource ModernComboBox}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Border Background="White" CornerRadius="5" Padding="25" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="Defeito e Observações" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#34495E"/>
+                                    <TextBlock Text="Defeito Alegado:" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="txtDefeitoReclamado" Margin="0,0,0,10" AcceptsReturn="True" TextWrapping="Wrap" Height="60" Style="{StaticResource ModernTextBox}"/>
+                                    <TextBlock Text="Complemento / Acessórios:" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="txtComplemento" Margin="0,0,0,10" AcceptsReturn="True" TextWrapping="Wrap" Height="40" Style="{StaticResource ModernTextBox}"/>
+                                    <TextBlock Text="Observação:" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="txtObservacao" Margin="0,0,0,10" AcceptsReturn="True" TextWrapping="Wrap" Height="60" Style="{StaticResource ModernTextBox}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="White" CornerRadius="5" Padding="25" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="Diagnóstico e Serviço" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#34495E"/>
+                                    <TextBlock Text="Defeito Real (Diagnóstico):" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="txtDefeitoReal" Margin="0,0,0,10" AcceptsReturn="True" TextWrapping="Wrap" Height="80" Style="{StaticResource ModernTextBox}"/>
+                                    <TextBlock Text="Serviço Executado:" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="txtServicoExecutado" Margin="0,0,0,10" AcceptsReturn="True" TextWrapping="Wrap" Height="80" Style="{StaticResource ModernTextBox}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="White" CornerRadius="5" Padding="25">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Valor R$:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtValorOS" Margin="15,5" PreviewTextInput="TextBox_PreviewTextInput" Style="{StaticResource ModernTextBox}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Técnico Responsável:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cmbTecnicoResponsavel" Margin="15,5" Style="{StaticResource ModernComboBox}"/>
+                                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Salvar Ordem de Serviço" x:Name="btnSalvarOS" Click="btnSalvarOS_Click" Margin="0,20,0,0" HorizontalAlignment="Center" Style="{StaticResource SuccessButton}"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Ordens Abertas" Name="OrdensAbertasTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Ordens de Serviço Abertas" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+                            <TextBox Grid.Row="1" x:Name="txtPesquisaOrdemAberta" TextChanged="txtPesquisaOrdem_TextChanged" Margin="0,0,0,10" Padding="8" Style="{StaticResource ModernTextBox}" ToolTip="Pesquisar por Nº OS, Cliente, Marca ou Técnico"/>
+                            <DataGrid Grid.Row="2" x:Name="dgOrdensAbertas" Style="{StaticResource ModernDataGrid}" Margin="0" LostFocus="DataGrid_LostFocus">
+                                <DataGrid.Resources>
+                                    <Style TargetType="ComboBox" x:Key="StatusComboBoxStyle">
+                                        <Setter Property="Padding" Value="10,5"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ComboBox">
+                                                    <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
+                                                        <ToggleButton x:Name="ToggleButton"
+                                  Focusable="false"
+                                  IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                  ClickMode="Press">
+                                                            <ToggleButton.Template>
+                                                                <ControlTemplate TargetType="ToggleButton">
+                                                                    <Border x:Name="PillBorder"
+                                        CornerRadius="14"
+                                        Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                        SnapsToDevicePixels="true">
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                                <ColumnDefinition Width="Auto"/>
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <Path x:Name="arrow" Grid.Column="1" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=ComboBox}}" Opacity="0.7" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,8,0" Data="M 0 0 L 4 4 L 8 0" />
+                                                                        </Grid>
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </ToggleButton.Template>
+                                                        </ToggleButton>
+                                                        <ContentPresenter x:Name="contentPresenter"
+                                      IsHitTestVisible="false"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                      TextElement.Foreground="{TemplateBinding Foreground}"/>
+
+                                                        <Popup x:Name="Popup"
+                           Placement="Bottom"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           PopupAnimation="Slide">
+                                                            <Grid x:Name="DropDown"
+                              SnapsToDevicePixels="True"
+                              MinWidth="{Binding ElementName=templateRoot, Path=ActualWidth}"
+                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                                                <Border x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#E0E0E0"
+                                    CornerRadius="4"
+                                    Margin="0,5,0,0">
+                                                                    <ScrollViewer SnapsToDevicePixels="True" MaxHeight="250">
+                                                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                                                    </ScrollViewer>
+                                                                </Border>
+                                                            </Grid>
+                                                        </Popup>
+                                                    </Grid>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsEnabled" Value="false">
+                                                            <Setter Property="Opacity" Value="0.56"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                            <Setter Property="Opacity" Value="0.9"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Status}" Value="Em análise">
+                                                <Setter Property="Background" Value="#EAF2F8" />
+                                                <Setter Property="Foreground" Value="#2874A6" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Orçamento emitido">
+                                                <Setter Property="Background" Value="#E8DAEF" />
+                                                <Setter Property="Foreground" Value="#6C3483" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Aguardando aprovação">
+                                                <Setter Property="Background" Value="#FDEBD0" />
+                                                <Setter Property="Foreground" Value="#AF601A" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Aprovado">
+                                                <Setter Property="Background" Value="#D4EFDF" />
+                                                <Setter Property="Foreground" Value="#1D8348" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Aguardando material">
+                                                <Setter Property="Background" Value="#FAD7A0" />
+                                                <Setter Property="Foreground" Value="#AF601A" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Em manutenção">
+                                                <Setter Property="Background" Value="#D6EAF8" />
+                                                <Setter Property="Foreground" Value="#2E86C1" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Manutenção concluída">
+                                                <Setter Property="Background" Value="#A9DFBF" />
+                                                <Setter Property="Foreground" Value="#196F3D" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Orçamento Negado">
+                                                <Setter Property="Background" Value="#FADBD8" />
+                                                <Setter Property="Foreground" Value="#C0392B" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Sem Conserto (Devolução)">
+                                                <Setter Property="Background" Value="#FADBD8" />
+                                                <Setter Property="Foreground" Value="#C0392B" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="Sem Conserto (Descarte)">
+                                                <Setter Property="Background" Value="#FADBD8" />
+                                                <Setter Property="Foreground" Value="#C0392B" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                    <Style x:Key="StatusComboBoxItemStyle" TargetType="ComboBoxItem">
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ComboBoxItem">
+                                                    <Border x:Name="Bd" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" CornerRadius="3">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse x:Name="StatusIndicator" Width="10" Height="10" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                                            <ContentPresenter x:Name="Content" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsHighlighted" Value="True">
+                                                            <Setter Property="Background" Value="#ECF0F1"/>
+                                                        </Trigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Em análise">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#2874A6" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#2874A6" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Orçamento emitido">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#6C3483" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#6C3483" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Aguardando aprovação">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#AF601A" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#AF601A" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Aprovado">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#1D8348" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#1D8348" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Aguardando material">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#AF601A" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#AF601A" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Em manutenção">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#2E86C1" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#2E86C1" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Manutenção concluída">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#196F3D" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#196F3D" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Orçamento Negado">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#C0392B" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#C0392B" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Sem Conserto (Devolução)">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#C0392B" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#C0392B" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="Sem Conserto (Descarte)">
+                                                            <Setter TargetName="StatusIndicator" Property="Fill" Value="#C0392B" />
+                                                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="#C0392B" />
+                                                        </DataTrigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nº OS" Binding="{Binding NumeroOS}" Width="Auto" MinWidth="80"/>
+                                    <DataGridTextColumn Header="Cliente" Binding="{Binding NomeClienteDisplay}" Width="2*" MinWidth="150"/>
+                                    <DataGridTextColumn Header="Marca" Binding="{Binding MarcaEquipamento}" Width="1*" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Modelo" Binding="{Binding ModeloEquipamento}" Width="1*" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat='C'}" Width="Auto" MinWidth="80"/>
+                                    <DataGridTextColumn Header="Técnico" Binding="{Binding TecnicoResponsavel}" Width="1.5*" MinWidth="120">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Margin" Value="10,0,0,0"/>
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+
+
+                                    <DataGridTemplateColumn Header="Status" MinWidth="190" Width="1.2*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox SelectedItem="{Binding Status, UpdateSourceTrigger=PropertyChanged}" 
+                                      SelectionChanged="cmbStatusOS_SelectionChanged"
+                                      IsEnabled="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                      Style="{StaticResource StatusComboBoxStyle}"
+                                      ItemContainerStyle="{StaticResource StatusComboBoxItemStyle}"
+                                      Margin="10,0,10,0">
+                                                    <System:String>Em análise</System:String>
+                                                    <System:String>Orçamento emitido</System:String>
+                                                    <System:String>Aguardando aprovação</System:String>
+                                                    <System:String>Aprovado</System:String>
+                                                    <System:String>Aguardando material</System:String>
+                                                    <System:String>Em manutenção</System:String>
+                                                    <System:String>Manutenção concluída</System:String>
+                                                    <System:String>Orçamento Negado</System:String>
+                                                    <System:String>Sem Conserto (Devolução)</System:String>
+                                                    <System:String>Sem Conserto (Descarte)</System:String>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Ações" Width="Auto" MinWidth="280">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="Detalhes" Click="btnVerDetalhesOS_Click"/>
+                                                    <Button Content="Editar" Click="btnEditarOrdemAberta_Click" Style="{StaticResource AdminOnlyButton}"/>
+
+                                                    <Button Content="Fechar OS" Click="btnFecharOrdemAberta_Click">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource AdminOnlyWarningButton}">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                                <Setter Property="ToolTip" Value="Mude o status para 'Manutenção concluída' ou um dos status de 'Sem Conserto'/'Orçamento Negado' para poder fechar a OS."/>
+                                                                <Style.Triggers>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding Status}" Value="Manutenção concluída"/>
+                                                                            <Condition Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                                        <Setter Property="ToolTip" Value="Fechar esta Ordem de Serviço."/>
+                                                                    </MultiDataTrigger>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding Status}" Value="Orçamento Negado"/>
+                                                                            <Condition Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                                        <Setter Property="ToolTip" Value="Fechar esta Ordem de Serviço (sem lançamento no caixa)."/>
+                                                                    </MultiDataTrigger>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding Status}" Value="Sem Conserto (Devolução)"/>
+                                                                            <Condition Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                                        <Setter Property="ToolTip" Value="Fechar esta Ordem de Serviço (sem lançamento no caixa)."/>
+                                                                    </MultiDataTrigger>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding Status}" Value="Sem Conserto (Descarte)"/>
+                                                                            <Condition Binding="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                                        <Setter Property="ToolTip" Value="Fechar esta Ordem de Serviço (sem lançamento no caixa)."/>
+                                                                    </MultiDataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+
+                                                    <Button Click="btnExcluirOrdemAberta_Click" Style="{StaticResource AdminOnlyDangerButton}" Width="32" Height="32" Padding="0" ToolTip="Excluir OS">
+                                                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+                <TabItem Header="Ordens Concluídas" Name="OrdensConcluidasTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Histórico de Ordens Concluídas" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+                            <TextBox Grid.Row="1" x:Name="txtPesquisaOrdemConcluida" TextChanged="txtPesquisaOrdem_TextChanged" Margin="0,0,0,10" Padding="8" Style="{StaticResource ModernTextBox}" ToolTip="Pesquisar por Nº OS, Cliente, Marca ou Técnico"/>
+                            <DataGrid Grid.Row="2" x:Name="dgOrdensConcluidas" Style="{StaticResource ModernDataGrid}" Margin="0" LostFocus="DataGrid_LostFocus">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nº OS" Binding="{Binding NumeroOS}" Width="Auto" MinWidth="80"/>
+                                    <DataGridTextColumn Header="Cliente" Binding="{Binding NomeClienteDisplay}" Width="2*" MinWidth="150"/>
+                                    <DataGridTextColumn Header="Marca" Binding="{Binding MarcaEquipamento}" Width="1*" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Modelo" Binding="{Binding ModeloEquipamento}" Width="1*" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat='C'}" Width="Auto" MinWidth="80"/>
+                                    <DataGridTextColumn Header="Técnico" Binding="{Binding TecnicoResponsavel}" Width="1.5*" MinWidth="120"/>
+                                    <DataGridTextColumn Header="Fechamento" Binding="{Binding DataFechamento, StringFormat='dd/MM/yyyy HH:mm'}" Width="1.5*" MinWidth="120"/>
+                                    <DataGridTemplateColumn Header="Ações" Width="Auto" MinWidth="160">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="Detalhes" Click="btnVerDetalhesOS_Click"/>
+                                                    <Button Content="Editar" Click="btnEditarOrdemConcluida_Click" Style="{StaticResource AdminOnlyButton}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+                <TabItem Header="Agendamento" Name="AgendamentoTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Agendamento de Coletas" FontSize="22" FontWeight="Bold" Margin="25,20,0,20" Foreground="#2C3E50"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel Margin="25,0,15,25" VerticalAlignment="Top">
+                                        <TextBlock Text="CADASTRAR NOVO AGENDAMENTO" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+                                        <Border Background="#FDFEFE" BorderBrush="#EAECEE" BorderThickness="1" CornerRadius="4" Padding="20">
+                                            <StackPanel>
+                                                <TextBlock Text="Cliente Cadastrado:" Margin="0,5,0,5"/>
+                                                <ComboBox x:Name="cmbClienteAgendamento" Style="{StaticResource ModernComboBox}" SelectionChanged="cmbClienteAgendamento_SelectionChanged"/>
+
+                                                <TextBlock Text="(ou) Cliente Avulso:" Margin="0,15,0,5"/>
+                                                <TextBox x:Name="txtNomeClienteAgendamento" Style="{StaticResource ModernTextBox}" />
+
+                                                <TextBlock Text="Endereço (Opcional):" Margin="0,15,0,5"/>
+                                                <TextBox x:Name="txtEnderecoAgendamento" Style="{StaticResource ModernTextBox}" />
+
+                                                <Grid Margin="0,15,0,0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="20"/>
+                                                        <ColumnDefinition Width="2*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                                        <TextBlock Text="Número:" Margin="0,0,0,5"/>
+                                                        <TextBox x:Name="txtNumeroAgendamento" Style="{StaticResource ModernTextBox}" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Row="0" Grid.Column="2">
+                                                        <TextBlock Text="Bairro:" Margin="0,0,0,5"/>
+                                                        <TextBox x:Name="txtBairroAgendamento" Style="{StaticResource ModernTextBox}" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,15,0,0">
+                                                        <TextBlock Text="Cidade:" Margin="0,0,0,5"/>
+                                                        <TextBox x:Name="txtCidadeAgendamento" Style="{StaticResource ModernTextBox}" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,15,0,0">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                                                <TextBlock Text="UF:" Margin="0,0,0,5"/>
+                                                                <TextBox x:Name="txtUfAgendamento" Style="{StaticResource ModernTextBox}" MaxLength="2"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="CEP:" Margin="0,0,0,5"/>
+                                                                <TextBox x:Name="txtCepAgendamento" Style="{StaticResource ModernTextBox}" MaxLength="9" TextChanged="txtCep_TextChanged"/>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <TextBlock Text="Equipamento para Coleta:" Margin="0,15,0,5"/>
+                                                <ComboBox x:Name="cmbEquipamentoAgendamento" Style="{StaticResource ModernComboBox}" SelectionChanged="cmbEquipamentoAgendamento_SelectionChanged"/>
+
+                                                <TextBox x:Name="txtOutroEquipamentoAgendamento" Style="{StaticResource ModernTextBox}" Margin="0,10,0,0" Visibility="Collapsed" ToolTip="Descreva o equipamento"/>
+
+                                                <Grid Margin="0,15,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="Data da Coleta:" Margin="0,0,0,5"/>
+                                                        <DatePicker x:Name="dpDataAgendamento" SelectedDate="{x:Static System:DateTime.Now}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="Hora:" Margin="0,0,0,5"/>
+                                                        <ComboBox x:Name="cmbHoraAgendamento" Style="{StaticResource ModernComboBox}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="4">
+                                                        <TextBlock Text="Minuto:" Margin="0,0,0,5"/>
+                                                        <ComboBox x:Name="cmbMinutoAgendamento" Style="{StaticResource ModernComboBox}"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <Button x:Name="btnSalvarAgendamento" Content="Salvar Agendamento" Style="{StaticResource SuccessButton}" HorizontalAlignment="Left" Margin="0,25,0,0" Click="btnSalvarAgendamento_Click"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+
+                                <StackPanel Grid.Column="1" Margin="15,0,25,25" VerticalAlignment="Top">
+                                    <TextBlock Text="AGENDAMENTOS PENDENTES" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+                                    <DataGrid x:Name="dgAgendamentos" Style="{StaticResource ModernDataGrid}" AutoGenerateColumns="False" LostFocus="DataGrid_LostFocus" MaxHeight="280">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Data" Binding="{Binding DataAgendamento, StringFormat='dd/MM/yyyy HH:mm'}" Width="1.2*" MinWidth="120"/>
+                                            <DataGridTextColumn Header="Cliente" Binding="{Binding NomeClienteDisplay}" Width="2*" MinWidth="180"/>
+                                            <DataGridTextColumn Header="Equipamento" Binding="{Binding Equipamento}" Width="2*" MinWidth="180"/>
+                                            <DataGridTemplateColumn Header="Ações" Width="*" MinWidth="220">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                            <Button Content="Detalhes" Click="btnVerDetalhesAgendamento_Click"/>
+                                                            <Button Content="Concluir" Click="btnConcluirAgendamento_Click" Style="{StaticResource AdminOnlyButton}"/>
+                                                            <Button Click="btnExcluirAgendamento_Click" Style="{StaticResource AdminOnlyDangerButton}" Width="32" Height="32" Padding="0" ToolTip="Excluir Agendamento">
+                                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="Caixa" Name="CaixaTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Fluxo de Caixa" FontSize="22" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
+
+                            <Border Grid.Row="1" BorderBrush="#ECF0F1" BorderThickness="1" CornerRadius="3" Padding="10" Margin="0,0,0,15">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Label Content="De:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <DatePicker x:Name="dpDataInicioCaixa" Margin="5,2" VerticalAlignment="Center" SelectedDateChanged="FiltroCaixa_Changed"/>
+
+                                        <Label Content="Até:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="15,0,0,0"/>
+                                        <DatePicker x:Name="dpDataFimCaixa" Margin="5,2" VerticalAlignment="Center" SelectedDateChanged="FiltroCaixa_Changed"/>
+
+                                        <Label Content="Técnico:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="15,0,0,0"/>
+                                        <ComboBox x:Name="cmbFiltroTecnico" Margin="5,2" MinWidth="150" SelectionChanged="FiltroCaixa_Changed" VerticalAlignment="Center"/>
+
+                                        <Button x:Name="btnLimparFiltroCaixa" Click="btnLimparFiltroCaixa_Click" Width="34" Height="34" Padding="0" ToolTip="Limpar Filtro" VerticalAlignment="Center" Margin="15,2,2,2">
+                                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Label Content="Filtros Rápidos:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="20,0,5,0"/>
+                                        <Button x:Name="btnFiltro7Dias" Content="Últimos 7 Dias" Click="btnFiltro7Dias_Click"/>
+                                        <Button x:Name="btnFiltro30Dias" Content="Últimos 30 Dias" Click="btnFiltro30Dias_Click"/>
+                                        <Button x:Name="btnImprimirRelatorioCaixa" Click="btnImprimirRelatorioCaixa_Click" Style="{StaticResource WarningButton}" Margin="15,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14"/>
+                                                <TextBlock Text="Relatório"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <DataGrid Grid.Row="2" x:Name="dgCaixa" Style="{StaticResource ModernDataGrid}" LostFocus="DataGrid_LostFocus">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat='dd/MM/yyyy HH:mm'}" Width="1.2*" MinWidth="120"/>
+                                    <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="3*" MinWidth="250"/>
+                                    <DataGridTextColumn Header="Técnico/Responsável" Binding="{Binding ResponsavelTransacao}" Width="1.5*" MinWidth="150"/>
+                                    <DataGridTemplateColumn Header="Tipo" Width="0.8*" MinWidth="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Tipo}" FontWeight="SemiBold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Tipo}" Value="Entrada">
+                                                                    <Setter Property="Foreground" Value="#27AE60"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Tipo}" Value="Saida">
+                                                                    <Setter Property="Foreground" Value="#E74C3C"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat='C'}" Width="1*" MinWidth="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Border Grid.Row="3" BorderBrush="#ECF0F1" BorderThickness="0,1,0,0" Padding="15" Margin="0,10,0,0">
+                                <StackPanel HorizontalAlignment="Stretch">
+                                    <Grid HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="120"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="120"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="120"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Total Entradas:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" x:Name="txtTotalGanho" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="#27AE60" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Column="2" Text="Total Saídas:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="25,0,10,0"/>
+                                        <TextBlock Grid.Column="3" x:Name="txtTotalGasto" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="#E74C3C" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Column="4" Text="Saldo do Período:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="25,0,10,0"/>
+                                        <TextBlock Grid.Column="5" x:Name="txtSaldoCaixa" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                    </Grid>
+
+                                    <GroupBox Header="Resumo por Responsável" Margin="0,15,0,0" FontWeight="SemiBold" Padding="10" HorizontalAlignment="Stretch">
+                                        <ItemsControl x:Name="pnlResumoPorResponsavel">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="Gainsboro" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10" MinWidth="200">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Nome}" FontWeight="Bold" FontSize="14" Foreground="#34495E"/>
+                                                            <TextBlock Text="{Binding TotalEntradas, StringFormat='Entradas: {0:C}'}" Foreground="#27AE60" Margin="0,5,0,0"/>
+                                                            <TextBlock Text="{Binding TotalSaidas, StringFormat='Saídas: {0:C}'}" Foreground="#E74C3C" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </GroupBox>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </TabItem>
+                <TabItem Header="Compras/Gastos" Name="ComprasGastosTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <Grid Margin="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" BorderBrush="#ECF0F1" BorderThickness="1" CornerRadius="5" Padding="25" Margin="0,0,0,15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Registrar Nova Compra ou Gasto" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#34495E"/>
+                                    <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumnCG"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumnCG"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Data:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5"/>
+                                        <DatePicker Grid.Row="0" Grid.Column="1" x:Name="dpDataCompraGasto" Margin="10,8" SelectedDate="{x:Static System:DateTime.Now}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Tipo:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="25,5,5,5"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="3" x:Name="cmbTipoCompraGasto" Margin="10,8" Cursor="Hand" Style="{StaticResource ModernComboBox}" SelectionChanged="cmbTipoCompraGasto_SelectionChanged"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Descrição:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtDescricaoCompraGasto" Margin="10,8" Style="{StaticResource ModernTextBox}"/>
+
+                                        <StackPanel x:Name="spAssociarOS" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Visibility="Collapsed">
+                                            <TextBlock Text="Associar à OS:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5,8,10,8"/>
+                                            <ComboBox x:Name="cmbAssociarOSCompraGasto" Margin="0,8,10,8" Style="{StaticResource ModernComboBox}" MinWidth="300" HorizontalAlignment="Left">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding NumeroOS}" FontWeight="Bold"/>
+                                                            <TextBlock Text=" - "/>
+                                                            <TextBlock Text="{Binding NomeClienteDisplay}"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Responsável:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="5"/>
+                                        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="cmbResponsavelCompraGasto" Margin="10,8" Style="{StaticResource ModernComboBox}"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="Valor R$:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="25,5,5,5"/>
+                                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="txtValorCompraGasto" Margin="10,8" PreviewTextInput="TextBox_PreviewTextInput" Style="{StaticResource ModernTextBox}"/>
+
+                                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Registrar Lançamento" x:Name="btnRegistrarCompraGasto" Click="btnRegistrarCompraGasto_Click" Margin="0,15,0,0" HorizontalAlignment="Left" Style="{StaticResource SuccessButton}"/>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <DataGrid Grid.Row="1" x:Name="dgComprasGastos" Style="{StaticResource ModernDataGrid}" LostFocus="DataGrid_LostFocus">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat='dd/MM/yyyy HH:mm'}" Width="1*" MinWidth="120"/>
+                                    <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="3*" MinWidth="250"/>
+                                    <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="1*" MinWidth="100"/>
+                                    <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat='C'}" Width="1*" MinWidth="110"/>
+                                    <DataGridTemplateColumn Header="Ações" Width="Auto" MinWidth="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Click="btnExcluirCompraGasto_Click" Style="{StaticResource AdminOnlyDangerButton}" Width="32" Height="32" Padding="0" ToolTip="Excluir Registro">
+                                                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="Acerto de Contas" Name="AcertoContasTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+
+                            <Grid Margin="25">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Acerto de Contas" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+
+                                <GroupBox Grid.Row="1" Header="Passo 1: Calcule o período e selecione os gastos a serem reembolsados" FontWeight="SemiBold" Padding="15" Margin="0,0,0,15">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                            <TextBlock Text="Calcular acerto para o período de:" VerticalAlignment="Center" FontWeight="Normal" Margin="0,0,15,0"/>
+                                            <Button x:Name="btnAcerto7dias" Content="Últimos 7 Dias" Click="btnAcertoPeriodo_Click" Tag="7"/>
+                                            <Button x:Name="btnAcerto15dias" Content="Últimos 15 Dias" Click="btnAcertoPeriodo_Click" Tag="15"/>
+                                            <Button x:Name="btnAcerto30dias" Content="Últimos 30 Dias" Click="btnAcertoPeriodo_Click" Tag="30"/>
+                                        </StackPanel>
+
+                                        <DataGrid x:Name="dgGastosAcerto" Style="{StaticResource ModernDataGrid}" MaxHeight="200" CanUserAddRows="False" AutoGenerateColumns="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Width="Auto">
+                                                    <DataGridTemplateColumn.Header>
+                                                        <CheckBox x:Name="chkSelecionarTodosGastos" Checked="chkSelecionarTodosGastos_Checked" Unchecked="chkSelecionarTodosGastos_Unchecked"/>
+                                                    </DataGridTemplateColumn.Header>
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Data" Binding="{Binding Lancamento.Data, StringFormat='dd/MM/yyyy'}" IsReadOnly="True" Width="*"/>
+                                                <DataGridTextColumn Header="Descrição do Gasto" Binding="{Binding Lancamento.Descricao}" IsReadOnly="True" Width="3*"/>
+                                                <DataGridTextColumn Header="Responsável" Binding="{Binding Lancamento.ResponsavelTransacao}" IsReadOnly="True" Width="1.5*"/>
+                                                <DataGridTextColumn Header="Valor" Binding="{Binding Lancamento.Valor, StringFormat=C}" IsReadOnly="True" Width="*"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </GroupBox>
+
+                                <GroupBox Grid.Row="2" Header="Passo 2: Atualize os reembolsos, defina as porcentagens e finalize o acerto" FontWeight="SemiBold" Padding="15">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Button Grid.Row="0" x:Name="btnAtualizarReembolsos" Content="Atualizar Reembolsos na Tabela Abaixo" Click="btnAtualizarReembolsos_Click" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+
+                                        <Grid Grid.Row="1" Margin="0,0,0,20">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Margin="5" Padding="20" Background="#EAF2F8" CornerRadius="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="TOTAL DE ENTRADAS" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D"/>
+                                                    <TextBlock x:Name="txtAcertoTotalEntradas" Text="R$ 0,00" FontSize="24" FontWeight="Bold" Foreground="#27AE60" Margin="0,8,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="1" Margin="5" Padding="20" Background="#FDEDEC" CornerRadius="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="TOTAL DE SAÍDAS (Período)" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D"/>
+                                                    <TextBlock x:Name="txtAcertoTotalSaidas" Text="R$ 0,00" FontSize="24" FontWeight="Bold" Foreground="#C0392B" Margin="0,8,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="2" Margin="5" Padding="20" Background="#F4F6F7" CornerRadius="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="LUCRO DO PERÍODO" FontSize="12" FontWeight="SemiBold" Foreground="#7F8C8D"/>
+                                                    <TextBlock x:Name="txtAcertoLucroPeriodo" Text="R$ 0,00" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" Margin="0,8,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+
+                                        <DataGrid Grid.Row="2" x:Name="dgAcertoUsuarios" Style="{StaticResource ModernDataGrid}" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="False">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Responsável" Binding="{Binding Username}" IsReadOnly="True" Width="2*" FontWeight="SemiBold"/>
+                                                <DataGridTemplateColumn Header="Porcentagem (%)" Width="1.2*">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBox Text="{Binding Percentage, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalContentAlignment="Right"/>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Gastos a Reembolsar" Binding="{Binding ExpensesToReimburse, StringFormat=C}" IsReadOnly="True" Width="1.5*"/>
+                                                <DataGridTextColumn Header="Parte no Lucro" Binding="{Binding ProfitShare, StringFormat=C}" IsReadOnly="True" Width="1.5*"/>
+                                                <DataGridTextColumn Header="TOTAL A RECEBER" Binding="{Binding TotalToReceive, StringFormat=C}" IsReadOnly="True" Width="2*" FontWeight="Bold"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </GroupBox>
+
+                                <Button Grid.Row="3" x:Name="btnCalcularAcertoFinal" Content="CALCULAR E FECHAR ACERTO" Click="btnCalcularAcertoFinal_Click" Style="{StaticResource SuccessButton}" HorizontalAlignment="Right" Padding="15,8" Margin="0,15,0,0"/>
+
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+                </TabItem>
+                <TabItem Header="Perfil" Name="PerfilTabItem">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="15" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <TextBlock Text="Perfil e Configurações" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2C3E50"/>
+
+                            <Border Background="White" CornerRadius="5" Padding="35" BorderBrush="#E0E0E0" BorderThickness="1" MinWidth="700" MaxWidth="800" Margin="0,0,0,25">
+                                <StackPanel>
+                                    <TextBlock Text="DADOS DE ACESSO" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="Nome de Usuário Atual:" Margin="0,5,0,5"/>
+                                    <TextBox x:Name="txtPerfilUsername" Style="{StaticResource ModernTextBox}" IsReadOnly="True" Background="#F2F3F4" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="Senha Atual (obrigatória para alterar):" Margin="0,5,0,5"/>
+                                    <PasswordBox x:Name="pwdPerfilSenhaAtual" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,15"/>
+
+                                    <Grid Margin="0,0,0,25">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Nova Senha:" Margin="0,0,0,5"/>
+                                            <PasswordBox x:Name="pwdPerfilNovaSenha" Style="{StaticResource ModernPasswordBox}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Confirmar Nova Senha:" Margin="0,0,0,5"/>
+                                            <PasswordBox x:Name="pwdPerfilConfirmarNovaSenha" Style="{StaticResource ModernPasswordBox}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <UniformGrid Columns="2" HorizontalAlignment="Right" Width="400">
+                                        <Button x:Name="btnLogout" Content="Sair (Logout)" Click="btnLogout_Click" Style="{StaticResource DangerButton}" Margin="0,0,5,0"/>
+                                        <Button x:Name="btnSalvarDadosAcesso" Content="Salvar Alterações de Acesso" Click="btnSalvarDadosAcesso_Click" Style="{StaticResource SuccessButton}" Margin="5,0,0,0"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border x:Name="pnlGerenciarContaSecundaria" Background="White" CornerRadius="5" Padding="35" BorderBrush="#E0E0E0" BorderThickness="1" MinWidth="700" MaxWidth="800" Margin="0,0,0,25">
+                                <StackPanel>
+                                    <TextBlock Text="CONTAS SECUNDÁRIAS (FUNCIONÁRIOS)" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+                                    <TextBlock Text="Contas com acesso limitado. Podem cadastrar clientes e criar/visualizar OS, mas não podem editar, excluir, fechar OS ou acessar áreas financeiras." TextWrapping="Wrap" Margin="0,0,0,15" Foreground="#566573"/>
+
+                                    <DataGrid x:Name="dgContasSecundarias" Style="{StaticResource ModernDataGrid}" Margin="0,0,0,15">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Nome de Usuário" Binding="{Binding Username}" Width="*"/>
+                                            <DataGridTemplateColumn Header="Incluir no Acerto de Contas" Width="1.5*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IncluirNoAcerto, UpdateSourceTrigger=PropertyChanged}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Checked="chkIncluirNoAcerto_Changed"
+                      Unchecked="chkIncluirNoAcerto_Changed"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <DataGridTemplateColumn Header="Ações" Width="Auto">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Click="btnExcluirContaSecundaria_Click" Style="{StaticResource AdminOnlyDangerButton}" ToolTip="Excluir Conta Secundária" Padding="8,4">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Excluir" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <Expander Header="Criar Nova Conta Secundária">
+                                        <StackPanel Margin="10,15,10,10">
+                                            <TextBlock Text="Nome de Usuário:" Margin="0,5,0,5"/>
+                                            <TextBox x:Name="txtNovoUsuarioSecundario" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+                                            <TextBlock Text="Senha:" Margin="0,5,0,5"/>
+                                            <PasswordBox x:Name="pwdNovoUsuarioSecundario" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,15"/>
+                                            <TextBlock Text="Confirmar Senha:" Margin="0,5,0,5"/>
+                                            <PasswordBox x:Name="pwdConfirmarNovoUsuarioSecundario" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,20"/>
+                                            <Button x:Name="btnCriarContaSecundaria" Content="Criar Conta Secundária" Click="btnCriarContaSecundaria_Click" Style="{StaticResource SuccessButton}" HorizontalAlignment="Left"/>
+                                        </StackPanel>
+                                    </Expander>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="White" CornerRadius="5" Padding="35" BorderBrush="#E0E0E0" BorderThickness="1" MinWidth="700" MaxWidth="800">
+                                <StackPanel>
+                                    <TextBlock Text="DADOS DA EMPRESA" FontSize="16" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,0,15"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Nome da Empresa:" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilNomeEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                            <TextBlock Text="CNPJ da Empresa:" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilCpfCnpjEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15" MaxLength="18" TextChanged="txtCpfCnpj_TextChanged"/>
+
+                                            <TextBlock Text="Endereço (Rua, Número, Bairro, Cidade):" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilEnderecoEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                            <TextBlock Text="Telefone para Contato:" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilTelefoneEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15" TextChanged="txtTelefone_TextChanged" MaxLength="19"/>
+
+                                            <TextBlock Text="Nome do Proprietário(a):" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilProprietario" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                            <TextBlock Text="Nome do Técnico/Funcionário Principal:" FontWeight="Normal" Margin="0,0,0,5"/>
+                                            <TextBox x:Name="txtPerfilFuncionario" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Center">
+                                            <TextBlock Text="Logo da Empresa" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                            <Border BorderBrush="Gainsboro" BorderThickness="1" Height="150" Width="150" CornerRadius="4" Background="#F8F9F9">
+                                                <Image x:Name="imgPerfilLogo" Stretch="Uniform"/>
+                                            </Border>
+                                            <Button x:Name="btnSelecionarNovaLogo" Content="Selecionar Logo" Click="btnSelecionarNovaLogo_Click" Margin="0,10,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Button x:Name="btnSalvarDadosEmpresa" Content="Salvar Alterações da Empresa" Click="btnSalvarDadosEmpresa_Click" Style="{StaticResource SuccessButton}" HorizontalAlignment="Right" Margin="0,20,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Importar/Exportar" Name="ImportarExportarTabItem">
+                    <Border Background="White" CornerRadius="5" Margin="15">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <Grid Margin="25">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="Gerenciamento de Backup e Restauração" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" Foreground="#2C3E50"/>
+
+                                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                                    <Border BorderBrush="#1ABC9C" BorderThickness="1.5" CornerRadius="5" Padding="30" Width="600" Background="#F8F9F9" Margin="0,0,0,40">
+                                        <StackPanel>
+                                            <TextBlock Text="BACKUP AUTOMÁTICO" FontSize="18" FontWeight="SemiBold" Foreground="#16A085"/>
+                                            <TextBlock TextWrapping="Wrap" Margin="0,10,0,20" Foreground="#566573">
+                                                Quando ativado, o sistema salvará uma cópia de segurança do banco de dados a cada 5 minutos no destino que você escolher.
+                                            </TextBlock>
+
+                                            <CheckBox x:Name="chkAutoBackup" FontWeight="Bold" Checked="chkAutoBackup_Checked" Unchecked="chkAutoBackup_Unchecked">
+                                                Ativar backup automático
+                                            </CheckBox>
+
+                                            <GroupBox Header="Destino do Backup Automático" Margin="0,15,0,0" IsEnabled="{Binding IsChecked, ElementName=chkAutoBackup}">
+                                                <StackPanel Margin="10">
+                                                    <RadioButton x:Name="rbLocal" GroupName="BackupDestination" Checked="rbDestination_Checked">
+                                                        <TextBlock>Salvar em uma pasta local <Run FontSize="10" Foreground="Gray">(Ex: Documentos\BackupsOficina)</Run></TextBlock>
+                                                    </RadioButton>
+                                                    <RadioButton x:Name="rbDrive" GroupName="BackupDestination" IsChecked="True" Margin="0,10,0,0" Checked="rbDestination_Checked">
+                                                        <TextBlock>Salvar na nuvem (Google Drive) <Run FontWeight="Bold" Foreground="#2980B9">(Recomendado)</Run></TextBlock>
+                                                    </RadioButton>
+                                                </StackPanel>
+                                            </GroupBox>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border BorderBrush="#EAECEE" BorderThickness="1" CornerRadius="5" Padding="30" Width="600">
+                                        <StackPanel>
+                                            <TextBlock Text="BACKUP MANUAL" FontSize="18" FontWeight="SemiBold" Foreground="#34495E"/>
+                                            <TextBlock TextWrapping="Wrap" Margin="0,10,0,20" Foreground="#566573">
+                                                Crie uma cópia de segurança agora mesmo no seu computador ou na sua conta do Google Drive.
+                                            </TextBlock>
+                                            <UniformGrid Columns="2">
+                                                <Button x:Name="btnExportarDados" Content="Salvar Backup Local" Click="btnExportarDados_Click" Margin="0,0,5,0" Style="{StaticResource SuccessButton}"/>
+                                                <Button x:Name="btnSalvarGoogleDrive" Content="Salvar no Google Drive" Click="btnSalvarGoogleDrive_Click" Margin="5,0,0,0" Style="{StaticResource {x:Type Button}}"/>
+                                            </UniformGrid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border BorderBrush="#FADBD8" BorderThickness="1.5" CornerRadius="5" Padding="30" Width="600" Margin="0,40,0,0" Background="#FDEDEC">
+                                        <StackPanel>
+                                            <TextBlock Text="RESTAURAR DADOS" FontSize="18" FontWeight="SemiBold" Foreground="#C0392B"/>
+                                            <TextBlock TextWrapping="Wrap" Margin="0,10,0,15" Foreground="#566573">
+                                                <Run FontWeight="Bold" Foreground="#C0392B">ATENÇÃO:</Run> Esta ação irá substituir <Run FontWeight="Bold">TODOS</Run> os seus dados atuais pelo conteúdo do arquivo de backup que você selecionar. Esta operação não pode ser desfeita.
+                                            </TextBlock>
+                                            <Button x:Name="btnImportarDados" Content="Importar (Restaurar Backup)" Click="btnImportarDados_Click" HorizontalAlignment="Center" Style="{StaticResource DangerButton}"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+                </TabItem>
+
+            </TabControl>
+
+            <StatusBar Grid.Row="2" Background="#ECF0F1">
+                <StatusBarItem>
+                    <TextBlock Text="Sistema de Oficina v2.0 - Design Moderno" Foreground="#7F8C8D"/>
+                </StatusBarItem>
+                <StatusBarItem HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding Source={x:Static System:DateTime.Now}, StringFormat='dd/MM/yyyy HH:mm'}" Foreground="#7F8C8D"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+
+        <Grid x:Name="SetupOverlayGrid" Background="#90000000" Visibility="Collapsed" Panel.ZIndex="1000">
+            <Border VerticalAlignment="Center" HorizontalAlignment="Center"
+                    Background="White" CornerRadius="8"
+                    MaxWidth="900" MinHeight="650"
+                    BorderBrush="#ABB2B9" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel x:Name="pnlSetupPasso1" Grid.Row="0" Margin="35">
+                        <TextBlock Text="Passo 1 de 2: Cadastro de Funcionários" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Adicione as contas para os seus funcionários que usarão o sistema." 
+                                   FontSize="14" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,25" TextWrapping="Wrap" TextAlignment="Center"/>
+
+                        <GroupBox Header="Adicionar Novo Funcionário" FontWeight="SemiBold" Padding="15">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="Nome de Usuário:" Margin="0,0,0,5" FontWeight="Normal"/>
+                                    <TextBox x:Name="txtSetupNomeFuncionario" Style="{StaticResource ModernTextBox}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="2">
+                                    <TextBlock Text="Cargo:" Margin="0,0,0,5" FontWeight="Normal"/>
+                                    <ComboBox x:Name="cmbSetupCargoFuncionario" Style="{StaticResource ModernComboBox}">
+                                        <System:String>Técnico</System:String>
+                                        <System:String>Atendente</System:String>
+                                        <System:String>Vendedor</System:String>
+                                        <System:String>Outro</System:String>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,15,0,0">
+                                    <TextBlock Text="Senha:" Margin="0,0,0,5" FontWeight="Normal"/>
+                                    <PasswordBox x:Name="pwdSetupSenhaFuncionario" Style="{StaticResource ModernPasswordBox}"/>
+                                </StackPanel>
+
+                                <Button x:Name="btnSetupAdicionarFuncionario" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Click="btnSetupAdicionarFuncionario_Click" Style="{StaticResource SuccessButton}" Content="Adicionar Funcionário"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <TextBlock Text="Funcionários Adicionados" Margin="0,20,0,10" FontWeight="SemiBold"/>
+                        <DataGrid x:Name="dgSetupFuncionarios" Style="{StaticResource ModernDataGrid}" MaxHeight="200" MinHeight="100">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nome" Binding="{Binding Username}" Width="*"/>
+                                <DataGridTextColumn Header="Cargo" Binding="{Binding Role}" Width="*"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Click="btnSetupRemoverFuncionario_Click" Style="{StaticResource DangerButton}" Padding="8,2">
+                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+
+                    <ScrollViewer x:Name="pnlSetupPasso2" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
+                        <StackPanel Margin="35">
+                            <TextBlock Text="Passo 2 de 2: Dados da Empresa" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Agora, preencha os dados principais da sua empresa que aparecerão nos relatórios." 
+                                       FontSize="14" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,30" TextWrapping="Wrap" TextAlignment="Center"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="25"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Nome da Empresa:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupNomeEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="CNPJ da Empresa:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupCpfCnpjEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15" MaxLength="18" TextChanged="txtCpfCnpj_TextChanged"/>
+
+                                    <TextBlock Text="Endereço (Rua, Número, Bairro, Cidade):" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupEnderecoEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="Telefone para Contato:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupTelefoneEmpresa" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15" TextChanged="txtTelefone_TextChanged" MaxLength="19"/>
+
+                                    <TextBlock Text="Nome do Proprietário(a) (Admin):" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupProprietario" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="Nome do Técnico/Funcionário Principal (para relatórios):" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="txtSetupFuncionario" Style="{StaticResource ModernTextBox}" Margin="0,0,0,15"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Center">
+                                    <TextBlock Text="Logo da Empresa" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <Border BorderBrush="Gainsboro" BorderThickness="1" Height="150" Width="150" CornerRadius="4" Background="#F8F9F9">
+                                        <Image x:Name="imgSetupLogo" Stretch="Uniform"/>
+                                    </Border>
+                                    <Button x:Name="btnSelecionarLogoSetup" Content="Selecionar Logo" Click="btnSelecionarLogoSetup_Click" Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="1" BorderThickness="0,1,0,0" BorderBrush="#E0E0E0" Padding="15" Background="#F8F9F9">
+                        <Grid>
+                            <Button x:Name="btnSetupVoltar" Content="Voltar" Click="btnSetupVoltar_Click" HorizontalAlignment="Left" IsEnabled="False"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="btnSetupAvancar" Content="Avançar" Click="btnSetupAvancar_Click" HorizontalAlignment="Right"/>
+                                <Button x:Name="btnSetupConcluir" Content="CONCLUIR CONFIGURAÇÃO" Click="btnSetupConcluir_Click" Style="{StaticResource SuccessButton}" FontWeight="Bold" Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <StackPanel x:Name="NotificationHost" 
+                    Grid.Row="0"
+                    Grid.RowSpan="3"
+                    VerticalAlignment="Top" 
+                    HorizontalAlignment="Right" 
+                    Margin="20"
+                    Panel.ZIndex="999"/>
+    </Grid>
+</Window>
